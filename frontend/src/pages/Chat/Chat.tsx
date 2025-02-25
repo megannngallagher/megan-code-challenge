@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { useLocation } from 'react-router-dom';
+import { Modal } from 'antd';
 
 export default function Chat({ socket }: { socket: Socket }) {
 
@@ -13,6 +14,7 @@ export default function Chat({ socket }: { socket: Socket }) {
   const [chatId, setChatId] = useState<string>('');
   const connectionId = location.state.connectionId 
   const users = [];
+  const [viewModal, setViewModal] = useState(true);
 
   const joinChat = (chatId: string, connectionId: string) => {
     console.log("chat id and connection id", chatId,connectionId)
@@ -29,7 +31,11 @@ export default function Chat({ socket }: { socket: Socket }) {
       setChatPage(true); 
     }
   };
-  
+
+  const closeModal = () => {
+    setViewModal(false);
+  };
+
    const sendMessage = () => {
     if (message.trim() && connectionId && receiverId) {
       socket.emit('sendMessageOver', { senderId: connectionId, receiverId, message, chatId });
@@ -65,6 +71,11 @@ export default function Chat({ socket }: { socket: Socket }) {
         <div>
           <h1>Chat</h1>
           <div>
+            <Modal
+              title="you are now on the chat page, enter the id of the receiver."
+              visible={viewModal}
+              onOk={closeModal}>
+            </Modal>
             <label>Select a receiver:</label>
             <input
               type="text"
